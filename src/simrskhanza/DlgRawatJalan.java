@@ -69,6 +69,7 @@ import permintaan.DlgBookingOperasi;
 import permintaan.DlgPermintaanKonsultasiMedik;
 import permintaan.DlgPermintaanKonsultasiPerawat;
 import rekammedis.RMDataResumePasien;
+import rekammedis.PanelRiwayatRalan;
 import permintaan.DlgPermintaanLaboratorium;
 import permintaan.DlgPermintaanPelayananInformasiObat;
 import permintaan.DlgPermintaanRadiologi;
@@ -259,6 +260,7 @@ public final class DlgRawatJalan extends javax.swing.JDialog {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private volatile boolean ceksukses = false;
     private DlgPeresepanDokter resepobat;
+    private PanelRiwayatRalan panelRiwayatRalan;
 
     /** Creates new form DlgPerawatan
      * @param parent
@@ -267,6 +269,7 @@ public final class DlgRawatJalan extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         initRawatJalan();
+        initPanelRiwayatRalan();
 
         this.setLocation(8,1);
         setSize(885,674);
@@ -1147,6 +1150,43 @@ public final class DlgRawatJalan extends javax.swing.JDialog {
         }
     }
     
+
+    private void initPanelRiwayatRalan() {
+        panelRiwayatRalan = new PanelRiwayatRalan(koneksi);
+        panelGlass12.setMinimumSize(new Dimension(930, 220));
+        panelRiwayatRalan.setMinimumSize(new Dimension(320, 300));
+        PanelInput.remove(panelGlass12);
+        PanelInput.add(panelGlass12, java.awt.BorderLayout.CENTER);
+        internalFrame5.remove(PanelInput);
+        internalFrame5.remove(Scroll3);
+
+        javax.swing.JPanel formDanTabel = new javax.swing.JPanel(new java.awt.BorderLayout(1, 1));
+        formDanTabel.setOpaque(false);
+        formDanTabel.setMinimumSize(new Dimension(930, 300));
+        formDanTabel.add(PanelInput, java.awt.BorderLayout.NORTH);
+        formDanTabel.add(Scroll3, java.awt.BorderLayout.CENTER);
+
+        javax.swing.JSplitPane split = new javax.swing.JSplitPane(
+                javax.swing.JSplitPane.HORIZONTAL_SPLIT, formDanTabel, panelRiwayatRalan);
+        split.setBorder(null);
+        split.setResizeWeight(0.60);
+        split.setContinuousLayout(true);
+        split.setDividerSize(5);
+        internalFrame5.add(split, java.awt.BorderLayout.CENTER);
+        SwingUtilities.invokeLater(() -> split.setDividerLocation(930));
+        panelRiwayatRalan.setNoRawat(TNoRw.getText());
+        TNoRw.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent event) {
+                panelRiwayatRalan.setNoRawat(TNoRw.getText());
+            }
+            @Override public void removeUpdate(DocumentEvent event) {
+                panelRiwayatRalan.setNoRawat(TNoRw.getText());
+            }
+            @Override public void changedUpdate(DocumentEvent event) {
+                panelRiwayatRalan.setNoRawat(TNoRw.getText());
+            }
+        });
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -14898,6 +14938,9 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
     @Override
     public void dispose() {
         executor.shutdownNow();
+        if (panelRiwayatRalan != null) {
+            panelRiwayatRalan.dispose();
+        }
         super.dispose();
     }
 }

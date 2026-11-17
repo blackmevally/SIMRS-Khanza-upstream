@@ -3896,6 +3896,50 @@ private void MnHapusObatOperasiActionPerformed(java.awt.event.ActionEvent evt) {
         ppBerkasDigital.setEnabled(akses.getberkas_digital_perawatan());     
         BtnPrint.setEnabled(akses.getoperasi());
     }
+
+    /** Opens the existing operation-report editor for one exact operation. */
+    public void openEditLaporanOperasi(String noRawat, String tglOperasi) {
+        if (!akses.getoperasi()) {
+            JOptionPane.showMessageDialog(null, "Akses ubah laporan operasi tidak tersedia.");
+            dispose();
+            return;
+        }
+        try {
+            java.sql.Date tanggal = java.sql.Date.valueOf(tglOperasi.substring(0, 10));
+            Tgl1.setDate(tanggal);
+            Tgl2.setDate(tanggal);
+            NoRawat.setText(noRawat);
+            TCari.setText("");
+            tampil();
+
+            int selectedRow = -1;
+            for (int row = 0; row < tabMode.getRowCount(); row++) {
+                String rowNoRawat = tabMode.getValueAt(row, 1).toString();
+                String rowTanggal = tabMode.getValueAt(row, 0).toString();
+                if (noRawat.equals(rowNoRawat) && rowTanggal.startsWith(tglOperasi)) {
+                    selectedRow = row;
+                    break;
+                }
+            }
+            if (selectedRow < 0) {
+                JOptionPane.showMessageDialog(null, "Data operasi untuk No. Rawat dan waktu tersebut tidak ditemukan.");
+                dispose();
+                return;
+            }
+
+            tbDokter.setRowSelectionInterval(selectedRow, selectedRow);
+            WindowLaporan.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent event) {
+                    DlgCariTagihanOperasi.this.dispose();
+                }
+            });
+            MnUbahLaporanActionPerformed(null);
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(null, "Laporan operasi tidak dapat dibuka: " + exception.getMessage());
+            dispose();
+        }
+    }
      
     private void getData() {
         int row=tbDokter.getSelectedRow();

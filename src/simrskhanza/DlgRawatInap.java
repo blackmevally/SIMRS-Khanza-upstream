@@ -12,6 +12,7 @@
 package simrskhanza;
 
 import rekammedis.RMRiwayatPerawatan;
+import rekammedis.PanelRiwayatSoap;
 import surat.SuratKontrol;
 import keuangan.DlgCariPerawatanRanap;
 import keuangan.DlgCariPerawatanRanap2;
@@ -200,6 +201,7 @@ public final class DlgRawatInap extends javax.swing.JDialog {
     private Jurnal jur=new Jurnal();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private volatile boolean ceksukses = false;
+    private PanelRiwayatSoap panelRiwayatSoap;
     private Connection koneksi=koneksiDB.condb();
     private PreparedStatement ps,ps2,ps3,ps4,ps5,ps6;
     private ResultSet rs;
@@ -215,6 +217,7 @@ public final class DlgRawatInap extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         initRawatInap();
+        initPanelRiwayatSoap();
 
         this.setLocation(8,1);
         setSize(885,674);
@@ -760,6 +763,46 @@ public final class DlgRawatInap extends javax.swing.JDialog {
     
     
 
+
+    private void initPanelRiwayatSoap() {
+        panelRiwayatSoap = new PanelRiwayatSoap(koneksi);
+        panelGlass12.setMinimumSize(new Dimension(900, 220));
+        panelRiwayatSoap.setMinimumSize(new Dimension(400, 300));
+
+        PanelInput1.remove(panelGlass12);
+        PanelInput1.add(panelGlass12, java.awt.BorderLayout.CENTER);
+        internalFrame5.remove(PanelInput1);
+        internalFrame5.remove(Scroll3);
+
+        javax.swing.JPanel panelFormDanTabel = new javax.swing.JPanel(new java.awt.BorderLayout(1, 1));
+        panelFormDanTabel.setOpaque(false);
+        panelFormDanTabel.setMinimumSize(new Dimension(900, 300));
+        panelFormDanTabel.add(PanelInput1, java.awt.BorderLayout.NORTH);
+        panelFormDanTabel.add(Scroll3, java.awt.BorderLayout.CENTER);
+
+        javax.swing.JSplitPane split = new javax.swing.JSplitPane(
+                javax.swing.JSplitPane.HORIZONTAL_SPLIT, panelFormDanTabel, panelRiwayatSoap);
+        split.setBorder(null);
+        split.setResizeWeight(0.64);
+        split.setContinuousLayout(true);
+        internalFrame5.add(split, java.awt.BorderLayout.CENTER);
+        panelRiwayatSoap.setNoRawat(TNoRw.getText());
+        panelRiwayatSoap.setOperationEditHandler((noRawat, tglOperasi) -> {
+            DlgCariTagihanOperasi formOperasi = new DlgCariTagihanOperasi(null, false);
+            formOperasi.openEditLaporanOperasi(noRawat, tglOperasi);
+        });
+        TNoRw.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent event) {
+                panelRiwayatSoap.setNoRawat(TNoRw.getText());
+            }
+            @Override public void removeUpdate(DocumentEvent event) {
+                panelRiwayatSoap.setNoRawat(TNoRw.getText());
+            }
+            @Override public void changedUpdate(DocumentEvent event) {
+                panelRiwayatSoap.setNoRawat(TNoRw.getText());
+            }
+        });
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -4377,6 +4420,7 @@ public final class DlgRawatInap extends javax.swing.JDialog {
                 }
             }
         }
+        panelRiwayatSoap.setNoRawat(TNoRw.getText());
 }//GEN-LAST:event_BtnSimpanActionPerformed
 
     private void BtnSimpanKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BtnSimpanKeyPressed
@@ -4898,6 +4942,7 @@ public final class DlgRawatInap extends javax.swing.JDialog {
         }
 
         BtnBatalActionPerformed(evt);
+        panelRiwayatSoap.setNoRawat(TNoRw.getText());
 }//GEN-LAST:event_BtnHapusActionPerformed
 
     private void BtnHapusKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BtnHapusKeyPressed
@@ -5692,6 +5737,7 @@ private void BtnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
                     break;                
             }
         }
+        panelRiwayatSoap.setNoRawat(TNoRw.getText());
 }//GEN-LAST:event_BtnEditActionPerformed
 
 private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BtnEditKeyPressed
@@ -9779,6 +9825,7 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
     
     public void setNoRm(String norwt,Date awal,Date akhir) {
         TNoRw.setText(norwt);
+        panelRiwayatSoap.setNoRawat(TNoRw.getText());
         isRawat();
         KdDok2.setText(KdDok.getText());
         TDokter2.setText(TDokter.getText()); 
@@ -12627,6 +12674,9 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
     @Override
     public void dispose() {
         executor.shutdownNow();
+        if (panelRiwayatSoap != null) {
+            panelRiwayatSoap.dispose();
+        }
         super.dispose();
     }
 }
